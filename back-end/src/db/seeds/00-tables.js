@@ -1,11 +1,11 @@
-const tables = require("../fixtures/tables");
+const tables = require('../fixtures/tables');
 
 exports.seed = function (knex) {
   // Deletes ALL existing entries
   return knex
-    .raw("TRUNCATE TABLE tables RESTART IDENTITY CASCADE")
+    .raw('TRUNCATE TABLE tables RESTART IDENTITY CASCADE')
     .then(function () {
       // Inserts seed entries
-      return knex("tables").insert(tables);
+      return knex('tables').insert(tables);
     });
 };
