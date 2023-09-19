@@ -5,6 +5,8 @@ const moment = require('moment');
 const reservatioService = require('./reservations.service');
 const hasProperties = require('../errors/hasProperties');
 const asyncErrorBoundary = require('../errors/asyncBoundaryError');
+
+// function to fetch the reservation by date or mobile number or all reservations list
 async function list(req, res) {
   const { date } = req.query;
   const { mobile_number } = req.query;
@@ -26,10 +28,10 @@ async function list(req, res) {
     return res.json({ data: newData });
   }
   const data = await reservatioService.list();
-  // console.log("data is ", data);
   res.json({ data });
 }
 
+// function to check reservation exists with reservation id
 async function reservationExists(req, res, next) {
   const reservationId = req.params.reservation_id;
   const reservation = await reservatioService.read(reservationId);
@@ -43,6 +45,7 @@ async function reservationExists(req, res, next) {
   });
 }
 
+// creating array of required property
 const VALID_PROPERTIES = [
   'first_name',
   'last_name',
@@ -73,6 +76,8 @@ function hasOnlyValidProperties(req, res, next) {
   }
   next();
 }
+
+// creating array of required property for update
 const VALID_PROPERTIES_UPDATE = [
   'first_name',
   'last_name',
@@ -85,6 +90,7 @@ const VALID_PROPERTIES_UPDATE = [
   'updated_at',
   'reservation_id',
 ];
+
 function hasOnlyValidUpdateProperties(req, res, next) {
   const { data = {} } = req.body;
 
@@ -114,6 +120,8 @@ const hasRequiredProperties = hasProperties(
   'reservation_time',
   'people'
 );
+
+// function to validate the date
 function hasvalidDate(req, res, next) {
   const { data: { reservation_date } = {} } = req.body;
   const date = new Date(reservation_date);
@@ -137,6 +145,8 @@ function hasvalidDate(req, res, next) {
     message: 'reservation_date is not valid',
   });
 }
+
+// function to validate the time
 function hasvalidTime(req, res, next) {
   const { data: { reservation_time } = {} } = req.body;
   if (reservation_time < '10:30' || reservation_time > '21:30') {
@@ -153,6 +163,8 @@ function hasvalidTime(req, res, next) {
     message: 'reservation_time is not valid',
   });
 }
+
+// function to validate the number of people
 function hasvalidPeople(req, res, next) {
   const { data: { people } = {} } = req.body;
   if (people.length || people === 0) {
@@ -164,6 +176,7 @@ function hasvalidPeople(req, res, next) {
   return next();
 }
 
+// function to validate the body status
 function hasValidStatus(req, res, next) {
   const { data: { status } = {} } = req.body;
   if (status && status !== 'booked') {
@@ -174,6 +187,8 @@ function hasValidStatus(req, res, next) {
   }
   next();
 }
+
+// function to create a new reservation
 async function create(req, res) {
   const { data } = req.body;
 
@@ -184,10 +199,13 @@ async function create(req, res) {
   res.status(201).json({ data: reservation });
 }
 
+// function to read resrvation but its id
 async function read(req, res) {
   const data = res.locals.reservation;
   res.json({ data });
 }
+
+// function to valdate the reservation status
 async function checkStatus(req, res, next) {
   const { data: { status } = {} } = req.body;
   const { reservation_id } = req.params;
@@ -206,6 +224,8 @@ async function checkStatus(req, res, next) {
   }
   next();
 }
+
+// function to update the reservation status
 async function updateStatus(req, res) {
   const { data: { status } = {} } = req.body;
   const { reservation_id } = req.params;
@@ -214,6 +234,7 @@ async function updateStatus(req, res) {
   res.json({ data: updatedStatus });
 }
 
+// function to update the reservation fields
 async function update(req, res) {
   const data = {
     ...req.body.data,
